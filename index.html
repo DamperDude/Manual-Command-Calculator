@@ -145,11 +145,11 @@
     
     <div class="info-box">
         <strong>Instructions:</strong> Enter measurements from print into the <strong>BLUE</strong> fields. 
-	<div><strong>GREEN</strong> fields auto-populate results.</div>
+	<div><strong>GREEN</strong> fields auto-populate results. <strong>ALL FIELDS</strong> must be entered to receive "Seal Cover to Rod Shoulder Measurement Results."</div>
     </div>
 
     <div class="section-header" style="color: var(--blue-border); margin-top: 36px; border-top: 1px solid #333; padding-top: 16px;">
-        Print Specs
+        Enter Print Specs
     </div>
     
     <div class="form-group">
@@ -187,18 +187,19 @@
 
     <div class="grid-row">
         <div class="form-group">
-            <label>Manual Entry for Full Ext</label>
+            <label>Full Ext Override</label>
             <input type="number" step="any" id="overrideFullExt" class="blue-input" placeholder="Clear" oninput="runCalculator()">
         </div>
         <div class="form-group">
-            <label>Manual Entry for Stickout</label>
+            <label>Stickout Override</label>
             <input type="number" step="any" id="overrideStickout" class="blue-input" placeholder="Clear" oninput="runCalculator()">
         </div>
     </div>
 
         <!-- Section 1: Physical Measurements -->
      <div class="section-header" style="color: var(--green-border); margin-top: 36px; border-top: 1px solid #333; padding-top: 16px;">
-        Measurement Results
+        Seal Cover to Rod Shoulder 
+	<div>Measurement Results</div>
     </div>
     
     <div class="grid-row">
@@ -219,23 +220,23 @@
 
     <!-- Section 2: Hardware Controller Manual Commands -->
     <div class="section-header" style="color: var(--green-border); margin-top: 36px; border-top: 1px solid #333; padding-top: 16px;">
-        Manual Commands
+        Manual Command Results
     </div>
 
     <div class="grid-row">
         <div class="form-group">
-            <label>Design / A Dim Manual Command</label>
+            <label>Design/A Dim M/C</label>
             <div id="outDesignCommand" class="green-output">0.00</div>
         </div>
         <div class="form-group">
-            <label>Curb Manual Command</label>
+            <label>Curb M/C</label>
             <div id="outCurbCommand" class="green-output">0.00</div>
         </div>
     </div>
 
     <div class="grid-row">
         <div class="form-group" style="grid-column: span 2;">
-            <label>MOAT/Midstroke Manual Command</label>
+            <label>MOAT/Midstroke M/C</label>
             <div id="outMidstrokeCommand" class="green-output">0.00</div>
         </div>
     </div>
@@ -276,13 +277,16 @@ function runCalculator() {
         // Design / A Dim Output Cell Calculation
         const finalDesignDimOut = designDim > tubeLength ? (designDim - tubeLength) : 0;
 
+        // Curb Output Cell Calculation (Mirrors Design Logic)
+        const finalCurbOut = curb > tubeLength ? (curb - tubeLength) : 0;
+
         // MOAT / Midstroke Output Cell Calculation
         const finalMidstrokeOut = finalFullExt > 0 ? (finalFullExt - 59.555) : 0;
 
         // Calculation of commands sent directly to the hardware controller
         const designCommand = finalFullExt > 0 ? (finalFullExt - finalDesignDimOut) : 0;
         const midstrokeCommand = finalFullExt > 0 ? ((finalFullExt - finalStickout) / 2.0) : 0;
-        const curbCommand = (curb > 0 && tubeLength > 0) ? (finalFullExt + finalStickout - (curb - tubeLength)) : 0;
+        const curbCommand = finalFullExt > 0 ? (finalFullExt - finalCurbOut) : 0;
 
         // 3. Update Display UI Targets (Ensures Live Text Injection)
         document.getElementById('outFullExt').innerText = finalFullExt.toFixed(2);
